@@ -42,7 +42,7 @@ def get_model_simple(loss=get_loss(), metrics=['accuracy', f1_metric(num_classes
         model_simple = Sequential([data_augmentation,
                                    model_simple])
     
-    model_simple.compile(optimizer=optimizer, loss=loss, metrics=metrics)
+    model_simple.compile(optimizer='adam', loss=loss, metrics=metrics)
     
     return model_simple
 
@@ -79,7 +79,7 @@ def get_model_tiny(loss=get_loss(), metrics=['accuracy', f1_metric(num_classes=3
         model_tiny = Sequential([data_augmentation,
                                  model_tiny])
 
-    model_tiny.compile(optimizer=optimizer, loss=loss, metrics=metrics)
+    model_tiny.compile(optimizer='adam', loss=loss, metrics=metrics)
     
     return model_tiny
 
@@ -116,7 +116,7 @@ def get_model_small(loss=get_loss(), metrics=['accuracy', f1_metric(num_classes=
         model_small = Sequential([data_augmentation,
                                   model_small])
 
-    model_small.compile(optimizer=optimizer, loss=loss, metrics=metrics)
+    model_small.compile(optimizer='adam', loss=loss, metrics=metrics)
     
     return model_small
 
@@ -153,7 +153,7 @@ def get_model_largew(loss=get_loss(), metrics=['accuracy', f1_metric(num_classes
         model_largew = Sequential([data_augmentation,
                                    model_largew])
 
-    model_largew.compile(optimizer=optimizer, loss=loss, metrics=metrics)
+    model_largew.compile(optimizer='adam', loss=loss, metrics=metrics)
     
     return model_largew
 
@@ -190,7 +190,7 @@ def get_model_larget(loss=get_loss(), metrics=['accuracy', f1_metric(num_classes
         model_larget = Sequential([data_augmentation,
                                    model_larget])
 
-    model_larget.compile(optimizer=optimizer, loss=loss, metrics=metrics)
+    model_larget.compile(optimizer='adam', loss=loss, metrics=metrics)
     
     return model_larget
 
@@ -217,7 +217,7 @@ def get_model_bit(model_url='https://tfhub.dev/google/bit/s-r50x1/1', loss=get_l
     
     model_bit = MyBiTModel(num_classes=num_classes, module=module)
 
-    model_bit.compile(optimizer=optimizer, loss=loss, metrics=metrics)
+    model_bit.compile(optimizer='adam', loss=loss, metrics=metrics)
 
     return model_bit
 
@@ -247,6 +247,6 @@ def get_efficientnet_b3(weights='imagenet', loss=get_loss(), metrics=['accuracy'
         model = Sequential([data_augmentation,
                             model])        
     
-    model.compile(optimizer=optimizer, loss=loss, metrics=metrics)
+    model.compile(optimizer='adam', loss=loss, metrics=metrics)
     
     return model
