@@ -19,9 +19,7 @@ Preprocessing steps are presented in:
 ![original image, patient contour and image with removed background](images/body&#32;contour.png)
 
 * [Lungs Segmentation](notebooks/Skimage-Lungs-Segmentation.ipynb) - lungs segmentation using skimage segmentation
-
 ![lungs contour and segmented lungs](images/skimage&#32;active&#32;contour.png)
-
 
 ## Results
 
