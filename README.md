@@ -13,7 +13,7 @@ The analysis of the dataset and other visualisations can be found in:
 
 Preprocessing steps are presented in:
 
-* Contour - finding patient's contour and background removal
+* [Patient Segmentation](notebooks/Background-Removal.ipynb) - finding patient's contour and background removal
 * [Lungs Segmentation](notebooks/Skimage-Lungs-Segmentation.ipynb) - lungs segmentation using skimage segmentation
 
 
