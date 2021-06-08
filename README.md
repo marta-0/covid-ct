@@ -21,7 +21,33 @@ Preprocessing steps are presented in:
 * [Lungs Segmentation](notebooks/Skimage-Lungs-Segmentation.ipynb) - lungs segmentation using skimage segmentation
 ![lungs contour and segmented lungs](images/skimage&#32;active&#32;contour.png)
 
+## Model configurations
+
+Several model architectures have been used:
+* Simple model created from scratch,
+* Tiny, Small, LargeW, LargeT architectures from [Transfusion: Understanding Transfer Learning for Medical Imaging](https://arxiv.org/abs/1902.07208),
+* ResNet-50 from [Google Big Transfer](https://tfhub.dev/google/bit/s-r50x1/1),
+* EfficientNet B0, B3, B7.
+
+Models were trained on images at different stages of processing:
+![five stages of preprocessing](images/images-preprocessing.png)
+
+The influence of class weight (*classw*) and data augmentation (*dataaug*) were examined. The lack of these methods is referred to as *baseline*.
+
 ## Results
+
+The highest f1 scores achieved on the validation set:
+
+| Model | Configuration | F1 Score | AUC |
+|  :-:  |      :-:      |    :-:   | :-: |
+| Simple | original-classw-dataaug | 0.810 | 0.925 |
+| Tiny | original-baseline | 0.861 | 0.954 |
+| Small | original-baseline | 0.860 | 0.944 |
+| LargeW | original-classw | 0.853 | 0.944 |
+| LargeT | orginal-baseline | 0.888 | 0.958 |
+| ResNet-50 | original-baseline | 0.766 | 0.893 |
+| EfficientNet B3 - weights ImageNet | lungs-baseline | 0.768 | 0.896 |
+| EfficientNet B3 - weights None | lungs-nocrop-baseline | 0.761 | 0.866 |
 
 Metrics and results plots are spread over several notebooks:
 
