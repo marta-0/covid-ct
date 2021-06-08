@@ -23,7 +23,15 @@ Preprocessing steps are presented in:
 
 ## Results
 
-<>
+Metrics and results plots are spread over several notebooks:
+
+* [F1 Scores](notebooks/F1-Scores.ipynb) - f1 scores achieved by models on validation set
+* [Confusion Matrices](notebooks/Confusion-Matrices.ipynb) - confusion matrices for each model configuration
+* [AUC Scores](notebooks/AUC-Scores.ipynb) - AUC scores for all models configurations along with ROC and Precision-Recall curves for the best models
+
+Explainability of the solution is taken up here:
+
+* [GradCAM](notebooks/GradCAM.ipynb) - GradCAM analysis
 
 ## Disclaimer
 
