@@ -58,6 +58,7 @@ Metrics and results plots are spread over several notebooks:
 Explainability of the solution is taken up here:
 
 * [GradCAM](notebooks/GradCAM.ipynb) - GradCAM analysis
+![original image, gradCAM heatmap and heatmap overlaid on the original image](images/gradcam-imagenet-cov.png)
 
 ## Disclaimer
 
