@@ -49,6 +49,19 @@ The highest f1 scores achieved on the validation set:
 | EfficientNet B3 - weights ImageNet | lungs-baseline | 0.768 | 0.896 |
 | EfficientNet B3 - weights None | lungs-nocrop-baseline | 0.761 | 0.866 |
 
+Scores achieved on the testset by the above best models:
+
+| Model | Configuration | F1 Score | AUC |
+|  :-:  |      :-:      |    :-:   | :-: |
+| Simple | original-classw-dataaug | 0.582 | 0.810 |
+| Tiny | original-baseline | 0.580 | 0.811 |
+| Small | original-baseline | 0.600 | 0.798 |
+| LargeW | original-classw | 0.634 | 0.792 |
+| LargeT | orginal-baseline | 0.577 | 0.796 |
+| ResNet-50 | original-baseline | 0.711 | 0.886 |
+| EfficientNet B3 - weights ImageNet | lungs-baseline | 0.629 | 0.845 |
+| EfficientNet B3 - weights None | lungs-nocrop-baseline | 0.570 | 0.760 |
+
 Metrics and results plots are spread over several notebooks:
 
 * [F1 Scores](notebooks/F1-Scores.ipynb) - f1 scores achieved by models on validation set
