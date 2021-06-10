@@ -13,13 +13,15 @@ from tensorflow.keras.preprocessing import image_dataset_from_directory
 from tensorflow.keras.preprocessing.image import ImageDataGenerator
 from tensorflow.keras.callbacks import ModelCheckpoint, EarlyStopping
 from tensorflow.keras.utils import to_categorical
+from tensorflow.keras import layers
+from tensorflow.keras.applications.efficientnet import EfficientNetB0, EfficientNetB3, EfficientNetB7
+from tensorflow.keras.models import Sequential
 
 from livelossplot.inputs.tf_keras import PlotLossesCallback
 
 
 CLASS_NAMES = ['COV', 'Normal', 'OtherPneumonia']
 SEED = 1
-
 
 
 def get_datasets(path_train, path_val, img_height, img_width, num_channels, batch_size, class_names=CLASS_NAMES, seed=SEED):
@@ -50,7 +52,6 @@ def get_datasets(path_train, path_val, img_height, img_width, num_channels, batc
     print(val_ds.class_names)
     
     return train_ds, val_ds
-
 
 
 def get_datagenerators(PATH_TRAIN, PATH_VAL, num_channels, img_width, img_height, batch_size, class_names=CLASS_NAMES, seed=SEED, if_dataaug=False, rotation=0, zoom=0, translation=0):   
@@ -97,7 +98,6 @@ def get_datagenerators(PATH_TRAIN, PATH_VAL, num_channels, img_width, img_height
     return train_generator, val_generator
 
 
-
 def get_model_checkpoint(filepath, monitor='val_f1_score', save_weights_only=False, save_best_only=True, verbose=1, mode='max'):
     model_checkpoint = ModelCheckpoint(filepath=filepath,
                                        save_weights_only=save_weights_only,
@@ -107,7 +107,6 @@ def get_model_checkpoint(filepath, monitor='val_f1_score', save_weights_only=Fal
                                        mode=mode)
     
     return model_checkpoint
-
 
 
 def get_early_stopping(monitor='val_loss', min_delta=0.001, patience=3, verbose=1, restore_best_weights=True):
@@ -120,12 +119,10 @@ def get_early_stopping(monitor='val_loss', min_delta=0.001, patience=3, verbose=
     return early_stopping
 
 
-
 def get_loss(from_logits=True):
     loss = tf.keras.losses.CategoricalCrossentropy(from_logits=from_logits)
     
     return loss
-    
 
 
 def train_model(get_model, train_ds, val_ds, dir_name, model_name, root, epochs, num_iter, class_weight=None):
@@ -141,6 +138,8 @@ def train_model(get_model, train_ds, val_ds, dir_name, model_name, root, epochs,
         class_weight = compute_class_weight('balanced', classes=[0, 1, 2], y=np.argmax(train_labels, axis=1)) 
         class_weight = dict(enumerate(class_weight))
         
+    if not os.path.isdir('best-models/' + dir_name + '-weights/'):
+        os.mkdir('best-models/' + dir_name + '-weights/')
     
     for _ in range(num_iter):
         model = get_model
@@ -155,12 +154,11 @@ def train_model(get_model, train_ds, val_ds, dir_name, model_name, root, epochs,
 
         else:
             if not os.path.isdir('history/' + dir_name + '/'):
-                os.mkdrir('history/' + dir_name + '/')
+                os.mkdir('history/' + dir_name + '/')
             with open('history/' + dir_name + '/' + model_name + '.json', 'w') as out:
                 json.dump(all_history, out)
-                
-                
-                
+
+
 def files_paths_labels(path, subset):
     files_paths = []
     files_labels = []
@@ -172,7 +170,7 @@ def files_paths_labels(path, subset):
             if file.split('.')[-1] != 'npy':
                 files_paths.append(root + '/' + file)
 
-                if p.parts[-2] == 'Train' or p.parts[-2] == 'Val': files_labels.append(p.parts[-1])
+                if p.parts[-2] == subset: files_labels.append(p.parts[-1])
                 else: files_labels.append(p.parts[-2])
     
     print(subset, len(files_paths), len(files_labels))
@@ -183,8 +181,7 @@ def files_paths_labels(path, subset):
     return files_paths, files_labels
 
 
-
-def prepare_X_y(files_paths, files_labels, width=512, height=512, num_channels=1):
+def prepare_X_y(files_paths, files_labels, img_width=512, img_height=512, num_channels=1):
     X = []
 
     for path in files_paths:
@@ -194,7 +191,7 @@ def prepare_X_y(files_paths, files_labels, width=512, height=512, num_channels=1
             img = cv2.imread(path, cv2.IMREAD_COLOR)
 
         if (img.shape[0] or img.shape[1]) != 512:
-            img = cv2.resize(img, (width,height))
+            img = cv2.resize(img, (img_width, img_height))
 
         X.append(img)
 
@@ -204,9 +201,9 @@ def prepare_X_y(files_paths, files_labels, width=512, height=512, num_channels=1
     return X, y
 
 
-
 def preprocess_matrices(X, y):
-    if X.ndim == 3 : X = np.expand_dims(X, axis=-1)
+    if X.ndim == 3 :
+        X = np.expand_dims(X, axis=-1)
 
     y = list(map(lambda x: CLASS_NAMES.index(x), y))
     y = np.asarray(y)
@@ -219,3 +216,27 @@ def preprocess_matrices(X, y):
     print('y shape: ', y.shape)
     
     return X, y
+
+
+def load_efficientnet(img_height, img_width, num_channels=3, num_classes=3, if_dataaug=False, data_augmentation=None, b=3):
+    #additional EfficientNet loading function - created due to model loading troubles
+
+    if b==3:
+        base_model = EfficientNetB3(weights=None, input_shape=(img_height, img_width, num_channels), include_top=True, classes=3)
+        
+    if b==0:
+        base_model = EfficientNetB0(weights=None, input_shape=(img_height, img_width, num_channels), include_top=True, classes=3)
+        
+    if b==7:
+        base_model = EfficientNetB7(weights=None, input_shape=(img_height, img_width, num_channels), include_top=True, classes=3)
+
+    inputs = layers.Input(shape=(img_height, img_width, num_channels))
+    
+    model = Sequential([inputs,
+                        base_model])
+    
+    if if_dataaug:
+        model = Sequential([data_augmentation,
+                            model])
+    
+    return model

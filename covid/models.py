@@ -1,13 +1,12 @@
 import tensorflow as tf
 from tensorflow.keras.models import Sequential
 from tensorflow.keras import layers
-from tensorflow.keras.applications.efficientnet import EfficientNetB3
+from tensorflow.keras.applications.efficientnet import EfficientNetB0, EfficientNetB3, EfficientNetB7
 
 import tensorflow_hub as hub
 
 from .metrics import f1_metric
 from .utils import get_loss
-
 
 
 SEED = 1
@@ -21,7 +20,6 @@ def dataaug_layer(rotation, zoom, translation, img_height, img_width, num_channe
                                              layers.experimental.preprocessing.RandomTranslation(translation, translation, seed=seed, fill_mode='constant')])
     
     return data_augmentation
-
 
 
 def get_model_simple(loss=get_loss(), metrics=['accuracy', f1_metric(num_classes=3)], if_dataaug=False, num_channels=1, num_classes=3, data_augmentation=None, img_height=512, img_width=512):
@@ -45,7 +43,6 @@ def get_model_simple(loss=get_loss(), metrics=['accuracy', f1_metric(num_classes
     model_simple.compile(optimizer='adam', loss=loss, metrics=metrics)
     
     return model_simple
-
 
 
 def get_model_tiny(loss=get_loss(), metrics=['accuracy', f1_metric(num_classes=3)], if_dataaug=False, num_channels=1, num_classes=3, data_augmentation=None, img_height=512, img_width=512):
@@ -84,7 +81,6 @@ def get_model_tiny(loss=get_loss(), metrics=['accuracy', f1_metric(num_classes=3
     return model_tiny
 
 
-
 def get_model_small(loss=get_loss(), metrics=['accuracy', f1_metric(num_classes=3)], if_dataaug=False, num_channels=1, num_classes=3, data_augmentation=None, img_height=512, img_width=512):
     
     model_small = Sequential([layers.experimental.preprocessing.Rescaling(1./255),
@@ -119,7 +115,6 @@ def get_model_small(loss=get_loss(), metrics=['accuracy', f1_metric(num_classes=
     model_small.compile(optimizer='adam', loss=loss, metrics=metrics)
     
     return model_small
-
 
 
 def get_model_largew(loss=get_loss(), metrics=['accuracy', f1_metric(num_classes=3)], if_dataaug=False, num_channels=1, num_classes=3, data_augmentation=None, img_height=512, img_width=512):
@@ -158,7 +153,6 @@ def get_model_largew(loss=get_loss(), metrics=['accuracy', f1_metric(num_classes
     return model_largew
 
 
-
 def get_model_larget(loss=get_loss(), metrics=['accuracy', f1_metric(num_classes=3)], if_dataaug=False, num_channels=1, num_classes=3, data_augmentation=None, img_height=512, img_width=512):
     
     model_larget = Sequential([layers.experimental.preprocessing.Rescaling(1./255),
@@ -195,7 +189,6 @@ def get_model_larget(loss=get_loss(), metrics=['accuracy', f1_metric(num_classes
     return model_larget
 
 
-
 class MyBiTModel(tf.keras.Model):
     """BiT model with a new head."""
 
@@ -209,9 +202,8 @@ class MyBiTModel(tf.keras.Model):
     def call(self, images):
         bit_embedding = self.bit_model(images)
         return self.head(bit_embedding)
-    
-    
-    
+
+
 def get_model_bit(model_url='https://tfhub.dev/google/bit/s-r50x1/1', loss=get_loss(), metrics=['accuracy', f1_metric(num_classes=3)], num_classes=3):
     module = hub.KerasLayer(model_url)
     
@@ -221,6 +213,34 @@ def get_model_bit(model_url='https://tfhub.dev/google/bit/s-r50x1/1', loss=get_l
 
     return model_bit
 
+
+def get_efficientnet_b0(weights='imagenet', loss=get_loss(), metrics=['accuracy', f1_metric(num_classes=3)], if_dataaug=False, num_channels=3, num_classes=3, data_augmentation=None, img_height=512, img_width=512):
+    
+    inputs = layers.Input(shape=(img_height, img_width, num_channels))
+    
+    if weights != 'imagenet':
+        outputs = EfficientNetB0(include_top=True, weights=weights, classes=num_classes, classifier_activation=None)(inputs)
+        
+    else:
+        model = EfficientNetB0(include_top=False, input_tensor=inputs, weights=weights)
+        model.trainable = False
+
+        x = layers.GlobalAveragePooling2D()(model.output)
+#         x = layers.BatchNormalization()(x)
+
+#         top_dropout_rate = 0.2
+#         x = layers.Dropout(top_dropout_rate, name="top_dropout")(x)
+        outputs = layers.Dense(num_classes)(x)
+
+    model = tf.keras.Model(inputs, outputs)
+        
+    if if_dataaug:
+        model = Sequential([data_augmentation,
+                            model])        
+    
+    model.compile(optimizer='adam', loss=loss, metrics=metrics)
+    
+    return model
 
 
 def get_efficientnet_b3(weights='imagenet', loss=get_loss(), metrics=['accuracy', f1_metric(num_classes=3)], if_dataaug=False, num_channels=3, num_classes=3, data_augmentation=None, img_height=512, img_width=512):
@@ -232,6 +252,35 @@ def get_efficientnet_b3(weights='imagenet', loss=get_loss(), metrics=['accuracy'
         
     else:
         model = EfficientNetB3(include_top=False, input_tensor=inputs, weights=weights)
+        model.trainable = False
+
+        x = layers.GlobalAveragePooling2D()(model.output)
+#         x = layers.BatchNormalization()(x)
+
+#         top_dropout_rate = 0.2
+#         x = layers.Dropout(top_dropout_rate, name="top_dropout")(x)
+        outputs = layers.Dense(num_classes)(x)
+
+    model = tf.keras.Model(inputs, outputs)
+        
+    if if_dataaug:
+        model = Sequential([data_augmentation,
+                            model])        
+    
+    model.compile(optimizer='adam', loss=loss, metrics=metrics)
+    
+    return model
+
+
+def get_efficientnet_b7(weights='imagenet', loss=get_loss(), metrics=['accuracy', f1_metric(num_classes=3)], if_dataaug=False, num_channels=3, num_classes=3, data_augmentation=None, img_height=512, img_width=512):
+    
+    inputs = layers.Input(shape=(img_height, img_width, num_channels))
+    
+    if weights != 'imagenet':
+        outputs = EfficientNetB7(include_top=True, weights=weights, classes=num_classes, classifier_activation=None)(inputs)
+        
+    else:
+        model = EfficientNetB7(include_top=False, input_tensor=inputs, weights=weights)
         model.trainable = False
 
         x = layers.GlobalAveragePooling2D()(model.output)
