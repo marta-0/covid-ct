@@ -1,6 +1,6 @@
 # COV19 Detection on CT Scans
 
-The project aims to analyze computed tomography (CT) images and classify them into one of three classes: COV, Normal, OtherPneumonia. The dataset is publicly available under [this link](https://github.com/m2dgithub/CT-COV19).
+The project aims to analyze computed tomography (CT) images and classify them into one of three classes: COV, Normal, OtherPneumonia. The dataset is publicly available under [this link](https://github.com/m2dgithub/CT-COV19) (data version used in the project: [link](https://github.com/m2dgithub/CT-COV19/tree/598e9b8e86cb8e54179a130c3d990ee97fde5353)).
 
 ![one example from each class](images/classes.png)
 
